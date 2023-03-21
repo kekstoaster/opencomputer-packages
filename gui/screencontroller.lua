@@ -1,20 +1,16 @@
 local os = require("os")
 local component = require("component")
+local class = require("class")
 
-local ControllerMeta = {}
-ControllerMeta["__index"] = ControllerMeta
+local Controller, static = class()
 
-
-function Controller(app)
-    local o = {}   -- create object if user does not provide one
-    o.app = app
-    setmetatable(o, ControllerMeta)
-    return o
+function Controller:new(app)
+    self.__app = app
 end
 
 function ControllerMeta:get_app()
-    return self.app
+    return self.__app
 end
 
 
-return Controller
+return static

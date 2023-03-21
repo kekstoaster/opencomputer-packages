@@ -1,98 +1,72 @@
 local component = require("component")
---local math = require("math")
+local class = require("class")
+local nullable = require("nullable")
 
-local component_base = require("gui/component/component_base")
+local BaseComponent = require("gui/component/component_base")
 local border_box = require("gui/border_box")
 
 
-local component_horizontal_center = component_base:new()
-component_horizontal_center["__index"] = component_horizontal_center
+local HorizontalCenter, static, base = class(BaseComponent)
 
-function component_horizontal_center:new (a)
-    a = a or {}
-    local o = component_base:new(a)
-
-    setmetatable(o, component_horizontal_center)
-    if a.component ~= nil then
-        o:set_component(a.component)
-    end
-    return o
+function HorizontalCenter:new (params)
+    params = params or {}
+    base.new(self, params)
+    self:set_component(params.component)
 end
 
-function component_horizontal_center:key_down(char, code)
-    if self.child ~= nil then
-        self.child:key_down(char, code)
-    end
+function HorizontalCenter:key_down(char, code)
+    self.__child:key_down(char, code)
 end
 
-function component_horizontal_center:clipboard(text)
-    if self.child ~= nil then
-        self.child:clipboard(text)
-    end
+function HorizontalCenter:clipboard(text)
+    self.__child:clipboard(text)
 end
 
-function component_horizontal_center:set_parent(parent)
-    self.parent = parent
-    if self.child ~= nil then
-        self.child.x = self:get_child_x()
-    end
+function HorizontalCenter:set_parent(parent)
+    base.set_parent(self, parent)
+    self.__child:set_x(self:get_child_x())
 end
 
-function component_horizontal_center:set_component(child)
-    self.child = child
-    if child ~= nil then
-        child:set_parent(self)
-        child.x = self:get_child_x()
-        child.y = 0
-    end
+function HorizontalCenter:set_component(child)
+    self.__child = nullable(child)
+    self.__child:set_parent(self)
+    self.__child:set_x(self:get_child_x())
+    self.__child:set_y(0)
 end
 
-function component_horizontal_center:get_height()
-    if self.child ~= nil then
-        return self.child:get_height()
-    else
-        return 1
-    end
+function HorizontalCenter:get_height()
+    return self.__child:get_height() or 1
 end
 
-function component_horizontal_center:get_width()
-    if self.parent ~= nil then
-        return self.parent:get_width()
+function HorizontalCenter:get_width()
+    if self.__parent ~= nil then
+        return self.__parent:get_width()
     else
         return 0
     end
 end
 
-function component_horizontal_center:get_child_x()
-    if self.child ~= nil then
-        return math.floor((self:get_width() - self.child:get_width()) / 2)
-    else
-        return 0
-    end
+function HorizontalCenter:get_child_x()
+    return math.floor((self:get_width() - (self.__child:get_width() or 0)) / 2)
 end
 
-function component_horizontal_center:click(x, y)
-    if self.child ~= nil then
-        self.child:checkClicked(x, y)
-    end
+function HorizontalCenter:click(x, y)
+    self.__child:checkClicked(x, y)
 end
 
-function component_horizontal_center:blur()
-    if self.has_focus then
-        self.child:blur()
-        self.has_focus = false
-        if self.blur_fn ~= nil then
-            self.blur_fn()
-            self.gpu:invalidate()
+function HorizontalCenter:blur()
+    if self.__has_focus then
+        self.__child:blur()
+        self.__has_focus = false
+        if self.__blur_fn ~= nil then
+            self.__blur_fn()
+            self:get_gpu():invalidate()
         end
     end
 end
 
-function component_horizontal_center:render()
-    if self.child ~= nil then
-        self.child:render()
-    end
+function HorizontalCenter:render()
+    self.__child:render()
 end
 
-
-return component_horizontal_center
+return static

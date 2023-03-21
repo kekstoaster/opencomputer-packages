@@ -1,117 +1,120 @@
 local os = require("os")
 local GuiProxy = require("gui/gui_proxy")
+local class = require("class")
 
-local ViewComponent = {}
-local ViewComponentMeta = {}
-ViewComponentMeta["__index"] = ViewComponentMeta
+local ViewComponent, static = class()
 
-
-function ViewComponent:new (a)
-    a = a or {}
-    local o = {}
-    o.parent = nil
-    o.gpu = GuiProxy:new(o)
-    o.name = a.name or ""
-    o.visible = true
-    o.y = a.y or 0
-    o.x = a.x or 0
-    if a.click ~= nil then
-        o.click_fn = a.click
+function ViewComponent:new(params)
+    params = params or {}
+    self.__parent = nil
+    self.__gpu = GuiProxy(self)
+    self.__name = params.name or ""
+    self.__visible = true
+    self.__y = params.y or 0
+    self.__x = params.x or 0
+    if params.click ~= nil then
+        self.__click_fn = params.click
     end
-    if a.focus ~= nil then
-        o.focus_fn = a.focus
+    if params.focus ~= nil then
+        self.__focus_fn = params.focus
     end
-    if a.blur ~= nil then
-        o.blur_fn = a.blur
+    if params.blur ~= nil then
+        self.__blur_fn = params.blur
     end
-    o.has_focus = false
-    setmetatable(o, ViewComponentMeta)
-    return o
+    self.__has_focus = false
 end
 
-function ViewComponent:meta (o)
-    o = o or {}
-    setmetatable(o, ViewComponentMeta)
-    return o
+function ViewComponent:set_parent(parent)
+    self.__parent = parent
 end
 
-function ViewComponentMeta:set_parent(parent)
-    self.parent = parent
+function ViewComponent:get_parent()
+    return self.__parent
 end
 
-function ViewComponentMeta:get_parent()
-    return self.parent
+function ViewComponent:get_gpu()
+    return self.__gpu
 end
 
-function ViewComponentMeta:get_x()
-    --return self.parent:get_x() + self.x
-    return self.x
+function ViewComponent:get_x()
+    return self.__x
 end
 
-function ViewComponentMeta:get_y()
-    --return self.parent:get_y() + self.y
-    return self.y
+function ViewComponent:set_x(x)
+    self.__x = x
 end
 
-function ViewComponentMeta:get_height()
+function ViewComponent:get_y(y)
+    return self.__y
+end
+
+function ViewComponent:set_y(y)
+    self.__y = y
+end
+
+function ViewComponent:get_height()
     return 0
 end
 
-function ViewComponentMeta:get_width()
+function ViewComponent:get_width()
     return 0
 end
 
-function ViewComponentMeta:render()
+function ViewComponent:render()
 
 end
 
-function ViewComponentMeta:click(x, y)
-    if self.click_fn ~= nil then
-        self.click_fn(x, y)
-        self.gpu:invalidate()
+function ViewComponent:click(x, y)
+    if self.__click_fn ~= nil then
+        self.__click_fn(x, y)
+        self.__gpu:invalidate()
     end
 end
 
-function ViewComponentMeta:key_down(char, code)
+function ViewComponent:key_down(char, code)
 
 end
 
-function ViewComponentMeta:clipboard(text)
+function ViewComponent:clipboard(text)
 
 end
 
-function ViewComponentMeta:show()
-    self.visible = true
-    self.gpu:invalidate()
+function ViewComponent:show()
+    self.__visible = true
+    self.__gpu:invalidate()
 end
 
-function ViewComponentMeta:hide()
-    self.visible = false
-    self.gpu:invalidate()
+function ViewComponent:hide()
+    self.__visible = false
+    self.__gpu:invalidate()
 end
 
-function ViewComponentMeta:focus()
-    if not self.has_focus then
-        self.has_focus = true
-        if self.focus_fn ~= nil then
-            self.focus_fn()
+function ViewComponent:is_visible()
+    return self.__visible
+end
+
+function ViewComponent:focus()
+    if not self.__has_focus then
+        self.__has_focus = true
+        if self.__focus_fn ~= nil then
+            self.__focus_fn()
         end
-        self.gpu:invalidate()
+        self.__gpu:invalidate()
     end
 end
 
-function ViewComponentMeta:blur()
-    if self.has_focus then
-        self.has_focus = false
-        if self.blur_fn ~= nil then
-            self.blur_fn()
+function ViewComponent:blur()
+    if self.__has_focus then
+        self.__has_focus = false
+        if self.__blur_fn ~= nil then
+            self.__blur_fn()
         end
-        self.gpu:invalidate()
+        self.__gpu:invalidate()
     end
 end
 
-function ViewComponentMeta:checkClicked(x, y)
-    if self.visible and x >= self:get_x() and x < self:get_x() + self:get_width() and y >= self:get_y() and y < self:get_y() + self:get_height() then
+function ViewComponent:checkClicked(x, y)
+    if self.__visible and x >= self:get_x() and x < self:get_x() + self:get_width() and y >= self:get_y() and y < self:get_y() + self:get_height() then
         self:focus()
         self:click(x - self:get_x(), y - self:get_y())
     else
@@ -119,6 +122,4 @@ function ViewComponentMeta:checkClicked(x, y)
     end
 end
 
-
-
-return ViewComponent
+return static

@@ -2,15 +2,11 @@ local filesystem = require("filesystem")
 local serialization = require("serialization")
 local io = require("io")
 
+local class = require("class")
 
+local FileMirror, static = class()
 
-local FileMirrorConstruct = {}
-local FileMirrorMeta = {}
-FileMirrorMeta["__index"] = FileMirrorMeta
-
-FileMirrorConstruct["__index"] = FileMirrorConstruct
-
-function FileMirrorConstruct(path)
+function FileMirror:new(path)
     local content
 
     if filesystem.exists(path) and not filesystem.isDirectory(path) then
@@ -29,33 +25,29 @@ function FileMirrorConstruct(path)
         content = {}
     end
 
-    local o = {}
-    o.content = content
-    o.path = path
-
-    setmetatable(o, FileMirrorMeta)
-    return o
+    self.__content = content
+    self.__path = path
 end
 
-function FileMirrorMeta:dump()
-    return self.content
+function FileMirror:dump()
+    return self.__content
 end
 
-function FileMirrorMeta:save()
-    local fp = io.open(self.path, "w")
-    fp:write(serialization.serialize(self.content))
+function FileMirror:save()
+    local fp = io.open(self.__path, "w")
+    fp:write(serialization.serialize(self.__content))
     fp:close()
 end
 
-function FileMirrorMeta:get(key)
-    if self.content[key] == nil then
-        self.content[key] = {}
+function FileMirror:get(key)
+    if self.__content[key] == nil then
+        self.__content[key] = {}
     end
-    return self.content[key]
+    return self.__content[key]
 end
 
-function FileMirrorMeta:set(key, value)
-    self.content[key] = value
+function FileMirror:set(key, value)
+    self.__content[key] = value
     self:save()
 end
 

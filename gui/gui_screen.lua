@@ -1,16 +1,8 @@
 local component = require("component")
 local event = require("event")
+local class = require("class")
 
-local GuiScreen = {}
-GuiScreen["__index"] = GuiScreen
-
-
-function GuiScreen:new (a)
-    o = {}   -- create object if user does not provide one
-    o.screen = a
-    setmetatable(o, GuiScreen)
-    return o
-end
+local GuiScreen, static = class()
 
 function GuiScreen:find_coord(x, y)
     return x + 1, y + 1
@@ -44,4 +36,4 @@ function GuiScreen:with_color(callback, fg_col, bg_col)
     end
 end
 
-return GuiScreen
+return static

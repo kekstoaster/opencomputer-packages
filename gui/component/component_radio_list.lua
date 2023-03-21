@@ -21,6 +21,10 @@ function component_radio_list:new (a)
     return o
 end
 
+function component_radio_list:value()
+    return self.options[self.selected_index].value
+end
+
 function component_radio_list:add_option(name, value)
     table.insert(self.options, {name=tostring(name), value=value})
     self.gpu:invalidate()

@@ -1,40 +1,36 @@
 local component = require("component")
 local unicode = require("unicode")
+local class = require("class")
 
-local component_base = require("gui/component/component_base")
+local BaseComponent = require("gui/component/component_base")
 local border_box = require("gui/border_box")
 
 
-local component_button = component_base:new()
-component_button["__index"] = component_button
+local Button, static, base = class(BaseComponent)
 
-function component_button:new (a)
-    a = a or {}
-    local o = component_base:new(a)
-    o.padding = a.padding or 0
-    o.text = a.text or ""
-    setmetatable(o, component_button)
-    return o
+function Button:new (params)
+    params = params or {}
+    base.new(self, params)
+    self.__padding = params.padding or 0
+    self.__text = params.text or ""
 end
 
-function component_button:set_text(text)
-    self.text = text
-    self.gpu:invalidate()
+function Button:set_text(text)
+    self.__text = text
+    self:get_gpu():invalidate()
 end
 
-function component_button:get_height()
+function Button:get_height()
     return 3
 end
 
-function component_button:get_width()
-    return 2 + 2 * self.padding + unicode.wlen(self.text)
+function Button:get_width()
+    return 2 + 2 * self.__padding + unicode.wlen(self.__text)
 end
 
-
-
-function component_button:render()
-    border_box.render_box_single(self.gpu, self:get_x(), self:get_y(), self:get_width(), self:get_height())
-    self.gpu:set(self:get_x() + self.padding + 1, self:get_y() + 1, self.text)
+function Button:render()
+    border_box.render_box_single(self:get_gpu(), self:get_x(), self:get_y(), self:get_width(), self:get_height())
+    self:get_gpu():set(self:get_x() + self.__padding + 1, self:get_y() + 1, self.__text)
 end
 
-return component_button
+return static

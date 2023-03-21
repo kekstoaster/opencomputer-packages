@@ -1,38 +1,34 @@
 local component = require("component")
 local unicode = require("unicode")
+local class = require("class")
 
-local component_base = require("gui/component_base")
+local BaseComponent = require("gui/component/component_base")
 local border_box = require("gui/border_box")
 
 
-local component_header = component_base:meta()
-component_header["__index"] = component_header
+local Header, static, base = class(BaseComponent)
 
-function component_header:new (a)
-    a = a or {}
-    local o = component_base:new(a)
-    o.padding = a.padding or 5
-    o.text = a.text or ""
-
-    setmetatable(o, component_header)
-    return o
+function Header:new(params)
+    params = params or {}
+    base.new(self, params)
+    self.__padding = params.padding or 5
+    self.__text = params.text or ""
 end
 
-function component_header:get_height()
+function Header:get_height()
     return 5
 end
 
-function component_header:get_width()
-    return 2 + 2 * self.padding + unicode.wlen(self.text)
+function Header:get_width()
+    return 2 + 2 * self.__padding + unicode.wlen(self.__text)
 end
 
-function component_header:render()
+function Header:render()
     local pw = self:get_parent():get_width()
     local sw = self:get_width()
     local x2 = (pw - sw) / 2
-    border_box.render_box_double(self.gpu, x2, self.y, sw, self:get_height())
-    self.gpu:set(x2 + self.padding + 1, self.y + 2, self.text)
+    border_box.render_box_double(self:get_gpu(), x2, self:get_y(), sw, self:get_height())
+    self:get_gpu():set(x2 + self.__padding + 1, self:get_y() + 2, self.__text)
 end
 
-
-return component_header
+return static
