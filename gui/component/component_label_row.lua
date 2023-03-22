@@ -33,6 +33,10 @@ function LabelRow:clipboard(text)
     end
 end
 
+function LabelRow:get_text()
+    return self.__text
+end
+
 function LabelRow:set_text(text)
     self.__text = text .. ""
     self:get_gpu():invalidate()

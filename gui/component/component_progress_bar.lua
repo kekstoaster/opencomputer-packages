@@ -1,101 +1,103 @@
 local component = require("component")
 local unicode = require("unicode")
+local class = require("class")
 
-local component_base = require("gui/component/component_base")
+local BaseComponent = require("gui/component/component_base")
 local border_box = require("gui/border_box")
 
 
-local component_progress_bar = component_base:meta()
-component_progress_bar["__index"] = component_progress_bar
+local ProgressBar, static, base = class(BaseComponent)
 
-function component_progress_bar:new (a)
-    a = a or {}
-    local o = component_base:new(a)
-    o.width = a.width or 20
-    o.value = a.value or 0
-    o.max = a.max or 100
-
-    setmetatable(o, component_progress_bar)
-    return o
+function ProgressBar:new(params)
+    params = params or {}
+    base.new(self, params)
+    self.__width = params.width or 20
+    self.__value = params.value or 0
+    self.__max = params.max or 100
 end
 
-function component_progress_bar:current_progress()
-    return math.max(0, math.min(100, math.floor(100 * self.value / self.max)))
+function ProgressBar:current_progress()
+    return math.max(0, math.min(100, math.floor(100 * self.__value / self.__max)))
 end
 
-function component_progress_bar:current_progress_width()
-    return math.max(0, math.min(self.width, math.floor(self.width * self.value / self.max)))
+function ProgressBar:current_progress_width()
+    return math.max(0, math.min(self.__width, math.floor(self.__width * self.__value / self.__max)))
 end
 
-function component_progress_bar:advance()
-    self.value = self.value + 1
+function ProgressBar:advance()
+    self.__value = self.__value + 1
+    self:get_gpu():invalidate()
 end
 
-function component_progress_bar:reset()
-    self.value = 0
+function ProgressBar:reset()
+    self.__value = 0
+    self:get_gpu():invalidate()
 end
 
+function ProgressBar:set_max(value)
+    self.__max = value
+end
 
-function component_progress_bar:get_height()
+function ProgressBar:get_height()
     return 3
 end
 
-function component_progress_bar:get_width()
-    return self.width + 2
+function ProgressBar:get_width()
+    return self.__width + 2
 end
 
-function component_progress_bar:render()
-    border_box.render_box_single(self.gpu, self:get_x(), self:get_y(), self:get_width(), self:get_height())
-    local crop = math.floor((self.width - 3) / 2)
+function ProgressBar:render()
+    border_box.render_box_single(self:get_gpu(), self:get_x(), self:get_y(), self:get_width(), self:get_height())
+    local crop = math.floor((self.__width - 3) / 2)
 
     if (self:current_progress_width() < crop) then
-        self.gpu:with_color(function()
-            self.gpu:fill(self:get_x() + 1, self:get_y() + 1, self:current_progress_width(), 1, " ")
+        self:get_gpu():with_color(function()
+            self:get_gpu():fill(self:get_x() + 1, self:get_y() + 1, self:current_progress_width(), 1, " ")
         end, 0x000000, 0xFFFFFF)
 
         if self:current_progress() < 10 then
-            self.gpu:set(self:get_x() + crop + 2, self:get_y() + 1, self:current_progress() .. "%")
+            self:get_gpu():set(self:get_x() + crop + 2, self:get_y() + 1, self:current_progress() .. "%")
         else
-            self.gpu:set(self:get_x() + crop + 1, self:get_y() + 1, self:current_progress() .. "%")
+            self:get_gpu():set(self:get_x() + crop + 1, self:get_y() + 1, self:current_progress() .. "%")
         end
     else
-        self.gpu:with_color(function()
-            self.gpu:fill(self:get_x() + 1, self:get_y() + 1, crop, 1, " ")
+        self:get_gpu():with_color(function()
+            self:get_gpu():fill(self:get_x() + 1, self:get_y() + 1, crop, 1, " ")
         end, 0x000000, 0xFFFFFF)
 
         if (self:current_progress_width() < crop + 3) then
             -- erste stelle
-            self.gpu:with_color(function()
+            self:get_gpu():with_color(function()
                 if self:current_progress() < 10 then
-                    self.gpu:set(self:get_x() + crop + 1, self:get_y() + 1, " ")
+                    self:get_gpu():set(self:get_x() + crop + 1, self:get_y() + 1, " ")
                 else
-                    self.gpu:set(self:get_x() + crop + 1, self:get_y() + 1, "" .. math.floor(self:current_progress() / 10))
+                    self:get_gpu():set(self:get_x() + crop + 1, self:get_y() + 1, "" .. math.floor(self:current_progress() / 10))
                 end
             end, 0x000000, 0xFFFFFF)
 
             if (self:current_progress_width() > crop) then
-                self.gpu:with_color(function()
-                    self.gpu:set(self:get_x() + crop + 2, self:get_y() + 1, "" .. (self:current_progress() % 10))
+                self:get_gpu():with_color(function()
+                    self:get_gpu():set(self:get_x() + crop + 2, self:get_y() + 1, "" .. (self:current_progress() % 10))
                 end, 0x000000, 0xFFFFFF)
             else
-                self.gpu:set(self:get_x() + crop + 2, self:get_y() + 1, "" .. (self:current_progress() % 10))
+                self:get_gpu():set(self:get_x() + crop + 2, self:get_y() + 1, "" .. (self:current_progress() % 10))
             end
 
-            self.gpu:set(self:get_x() + crop + 3, self:get_y() + 1, "%")
+            self:get_gpu():set(self:get_x() + crop + 3, self:get_y() + 1, "%")
         else
-            self.gpu:with_color(function()
+            self:get_gpu():with_color(function()
                 if self:current_progress() < 10 then
-                    self.gpu:set(self:get_x() + crop + 1, self:get_y() + 1, " " .. self:current_progress() .. "%")
+                    self:get_gpu():set(self:get_x() + crop + 1, self:get_y() + 1, " " .. self:current_progress() .. "%")
                 elseif self:current_progress() == 100 then
-                    self.gpu:set(self:get_x() + crop, self:get_y() + 1, "100%")
+                    self:get_gpu():set(self:get_x() + crop, self:get_y() + 1, "100%")
                 else
-                    self.gpu:set(self:get_x() + crop + 1, self:get_y() + 1, self:current_progress() .. "%")
+                    self:get_gpu():set(self:get_x() + crop + 1, self:get_y() + 1, self:current_progress() .. "%")
                 end
             end, 0x000000, 0xFFFFFF)
 
             if self:current_progress_width() > crop + 3 then
-                self.gpu:with_color(function()
-                    self.gpu:fill(self:get_x() + crop + 4, self:get_y() + 1, self:current_progress_width() - crop - 3, 1, " ")
+                self:get_gpu():with_color(function()
+                    self:get_gpu():fill(self:get_x() + crop + 4, self:get_y() + 1, self:current_progress_width() - crop - 3, 1, " ")
                 end, 0x000000, 0xFFFFFF)
             end
         end
@@ -103,4 +105,4 @@ function component_progress_bar:render()
 end
 
 
-return component_progress_bar
+return static
