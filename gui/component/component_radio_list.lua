@@ -1,102 +1,99 @@
-local component = require("component")
 local unicode = require("unicode")
+local class = require("class")
 
-local component_base = require("gui/component/component_base")
+local BaseComponent = require("gui/component/component_base")
 local border_box = require("gui/border_box")
 
 
-local component_radio_list = component_base:new()
-component_radio_list["__index"] = component_radio_list
+local RadioList, static, base = class(BaseComponent)
 
-function component_radio_list:new (a)
-    a = a or {}
-    local o = component_base:new(a)
-    o.options = {}
-    o.selected_index = 1
-    o.spacing = a.spacing or 2
-    if a.select ~= nil then
-        o.select_fn = a.select
+function RadioList:new (params)
+    params = params or {}
+    base.new(self, params)
+    self.__options = {}
+    self.__selected_index = 1
+    self.__spacing = params.spacing or 2
+    if params.select ~= nil then
+        self.__select_fn = params.select
     end
-    setmetatable(o, component_radio_list)
-    return o
 end
 
-function component_radio_list:value()
-    return self.options[self.selected_index].value
+function RadioList:value()
+    return self.__options[self.__selected_index].value
 end
 
-function component_radio_list:add_option(name, value)
-    table.insert(self.options, {name=tostring(name), value=value})
-    self.gpu:invalidate()
+function RadioList:add_option(name, value)
+    table.insert(self.__options, {name=tostring(name), value=value})
+    self:get_gpu():invalidate()
 end
 
-function component_radio_list:select(value)
-    for i = 1,#self.options do
-        local item = self.options[i]
+function RadioList:select(value)
+    for i = 1,#self.__options do
+        local item = self.__options[i]
         if item.value == value then
-            self.selected_index = i
-            self.gpu:invalidate()
+            self.__selected_index = i
+            self:get_gpu():invalidate()
             break
         end
     end
 end
 
-function component_radio_list:get_height()
+function RadioList:get_height()
     return 3
 end
 
-function component_radio_list:get_width()
+function RadioList:get_width()
     local txt_len = 0
-    if #self.options > 0 then
-        for k, v in ipairs(self.options) do
+    if #self.__options > 0 then
+        for k, v in ipairs(self.__options) do
             txt_len = txt_len + unicode.wlen(v.name)
         end
-        txt_len = txt_len + 4 + (4 + self.spacing) * (#self.options - 1)
+        txt_len = txt_len + 4 + (4 + self.__spacing) * (#self.__options - 1)
     end
     return txt_len
 end
 
-function component_radio_list:click(x, y)
+function RadioList:click(x, y)
     local clicked_index = nil
     local txt_len = 0
     local selected_value = nil
-    if #self.options > 0 then
-        for k, v in ipairs(self.options) do
-            local length = #v.name + 4
+    if #self.__options > 0 then
+        for k, v in ipairs(self.__options) do
+            local length = unicode.wlen(v.name) + 4
             if x >= txt_len and x < txt_len + length then
                 clicked_index = k
                 selected_value = v.value
                 break
             end
-            txt_len = txt_len + unicode.wlen(v.name) + 4 + self.spacing
+            txt_len = txt_len + unicode.wlen(v.name) + 4 + self.__spacing
         end
 
-        if clicked_index ~= nil and clicked_index ~= self.selected_index then
-            self.selected_index = clicked_index
-            self.gpu:invalidate()
-            if self.select_fn ~= nil then
-                self.select_fn(selected_value)
+        if clicked_index ~= nil and clicked_index ~= self.__selected_index then
+            self.__selected_index = clicked_index
+            self:get_gpu():invalidate()
+            if self.__select_fn ~= nil then
+                self.__select_fn(selected_value)
             end
         end
     end
 end
 
-function component_radio_list:render()
-    if #self.options > 0 then
+function RadioList:render()
+    if #self.__options > 0 then
         local xp = 0
-        for k, v in ipairs(self.options) do
+        for k, v in ipairs(self.__options) do
             local cb = function()
-                border_box.render_box_single(self.gpu, self:get_x() + xp, self:get_y(), unicode.wlen(v.name) + 4, self:get_height())
-                self.gpu:set(self:get_x() + xp + 2, self:get_y() + 1, v.name)
+                border_box.render_box_single(self:get_gpu(), self:get_x() + xp, self:get_y(), unicode.wlen(v.name) + 4, self:get_height())
+                self:get_gpu():set(self:get_x() + xp + 2, self:get_y() + 1, v.name)
             end
-            if k == self.selected_index then
-                self.gpu:with_color(cb, 0x0000FF)
+            if k == self.__selected_index then
+                self:get_gpu():with_color(cb, 0x0000FF)
             else
                 cb()
             end
-            xp = xp + unicode.wlen(v.name) + 4 + self.spacing
+            xp = xp + unicode.wlen(v.name) + 4 + self.__spacing
         end
     end
 end
 
-return component_radio_list
+return static

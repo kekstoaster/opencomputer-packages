@@ -1,9 +1,7 @@
-local component = require("component")
 local class = require("class")
 local nullable = require("nullable")
 
 local BaseComponent = require("gui/component/component_base")
-local border_box = require("gui/border_box")
 
 
 local HorizontalCenter, static, base = class(BaseComponent)
@@ -39,8 +37,8 @@ function HorizontalCenter:get_height()
 end
 
 function HorizontalCenter:get_width()
-    if self.__parent ~= nil then
-        return self.__parent:get_width()
+    if self:get_parent() ~= nil then
+        return self:get_parent():get_width()
     else
         return 0
     end

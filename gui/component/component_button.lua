@@ -1,4 +1,3 @@
-local component = require("component")
 local unicode = require("unicode")
 local class = require("class")
 

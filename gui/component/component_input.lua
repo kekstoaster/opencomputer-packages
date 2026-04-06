@@ -1,4 +1,3 @@
-local component = require("component")
 local event = require("event")
 local unicode = require("unicode")
 
@@ -79,8 +78,8 @@ function TextInput:click(x, y)
             self.__curser_pos = unicode.wlen(self.__text) + 1
         end
     end
-    if self.click_fn ~= nil then
-        self.click_fn(x, y)
+    if self.__click_fn ~= nil then
+        self.__click_fn(x, y)
     end
     self:get_gpu():invalidate()
 end
@@ -150,10 +149,9 @@ end
 function TextInput:focus()
     if not self.__has_focus then
         self.__has_focus = true
-        if self.focus_fn ~= nil then
-            self.focus_fn()
+        if self.__focus_fn ~= nil then
+            self.__focus_fn()
         end
-        local x, y = self:get_gpu():find_coord(2, 1)
         local blink_fn = function()
             if self.__blink then
                 self.__blink = false
@@ -174,8 +172,8 @@ end
 function TextInput:blur()
     if self.__has_focus then
         self.__has_focus = false
-        if self.blur_fn ~= nil then
-            self.blur_fn()
+        if self.__blur_fn ~= nil then
+            self.__blur_fn()
         end
         self.__blink = false
         if self.__blink_id ~= nil then

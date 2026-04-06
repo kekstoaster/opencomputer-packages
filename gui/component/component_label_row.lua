@@ -1,12 +1,7 @@
-local component = require("component")
 local unicode = require("unicode")
 local class = require("class")
-local os = require("os")
-
-local serialization = require("serialization")
 
 local BaseComponent = require("gui/component/component_base")
-local border_box = require("gui/border_box")
 
 
 local LabelRow, static, base = class(BaseComponent)
@@ -83,13 +78,13 @@ function LabelRow:click(x, y)
 end
 
 function LabelRow:blur()
-    if self.has_focus then
+    if self.__has_focus then
         if self.child ~= nil then
             self.child:blur()
         end
-        self.has_focus = false
-        if self.blur_fn ~= nil then
-            self.blur_fn()
+        self.__has_focus = false
+        if self.__blur_fn ~= nil then
+            self.__blur_fn()
             self:get_gpu():invalidate()
         end
     end

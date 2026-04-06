@@ -1,4 +1,4 @@
-function nullable(class)
+local function nullable(class)
     if class ~= nil then
         return class
     end
@@ -7,7 +7,9 @@ function nullable(class)
     local chainable = function()
         return class
     end
-    setmetatable(class, {["__call"]=chainable})
+    setmetatable(class, {["__call"]=chainable, ["__index"]=function(_, key)
+        return chainable
+    end})
 
     return class
 end

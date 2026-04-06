@@ -1,5 +1,3 @@
-local component = require("component")
-local unicode = require("unicode")
 local class = require("class")
 
 local BaseComponent = require("gui/component/component_base")

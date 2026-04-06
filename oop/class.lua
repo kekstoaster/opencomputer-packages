@@ -1,12 +1,12 @@
-function object_new()
+local function object_new()
 
 end
 
-function object()
+local function object()
     return {["new"] = object_new}
 end
 
-function new_class(base)
+local function new_class(base)
     base = base or object
     base = base()
 
@@ -14,14 +14,14 @@ function new_class(base)
     local meta = {["__index"]=class}
     setmetatable(class, {["__index"]=base})
 
-    function construct(func, ...)
+    local function construct(func, ...)
         local o = {}
         setmetatable(o, meta)
         o:new(...)
         return o
     end
 
-    construct_obj = {}
+    local construct_obj = {}
     setmetatable(construct_obj, {["__call"]=construct})
 
     return class, construct_obj, base

@@ -13,7 +13,7 @@ local border_list_block = {
     "▌","▐","▀","▄","▟","▙","▛","▜","█","█","█","█","█",
 }
 
-function render_box(gpu, x, y, w, h, border_list)
+local function render_box(gpu, x, y, w, h, border_list)
     if w < 2 or h < 2 then return end
     gpu:set(x, y, border_list[7])
     gpu:set(x + w - 1, y, border_list[8])
@@ -35,15 +35,15 @@ function render_box(gpu, x, y, w, h, border_list)
     end
 end
 
-function render_box_single(gpu, x, y, w, h)
+local function render_box_single(gpu, x, y, w, h)
     render_box(gpu, x, y, w, h, border_list_single)
 end
 
-function render_box_double(gpu, x, y, w, h)
+local function render_box_double(gpu, x, y, w, h)
     render_box(gpu, x, y, w, h, border_list_double)
 end
 
-function render_box_block(gpu, x, y, w, h)
+local function render_box_block(gpu, x, y, w, h)
     render_box(gpu, x, y, w, h, border_list_block)
 end
 

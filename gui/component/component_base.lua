@@ -1,4 +1,3 @@
-local os = require("os")
 local GuiProxy = require("gui/gui_proxy")
 local class = require("class")
 
@@ -44,7 +43,7 @@ function ViewComponent:set_x(x)
     self.__x = x
 end
 
-function ViewComponent:get_y(y)
+function ViewComponent:get_y()
     return self.__y
 end
 

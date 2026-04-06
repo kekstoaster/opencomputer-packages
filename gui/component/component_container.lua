@@ -1,9 +1,6 @@
-local component = require("component")
-local unicode = require("unicode")
 local class = require("class")
 
 local BaseComponent = require("gui/component/component_base")
-local border_box = require("gui/border_box")
 
 
 local Container, static, base = class(BaseComponent)

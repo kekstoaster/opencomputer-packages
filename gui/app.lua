@@ -1,5 +1,4 @@
 local event = require("event")
-local serialization = require("serialization")
 local class = require("class")
 
 local GuiApp, static = class()
@@ -72,7 +71,7 @@ function GuiApp:render ()
     end
 end
 
-function GuiApp__process_event(self, id, ...)
+local function GuiApp__process_event(self, id, ...)
     if type(self["on_" .. id]) == "function" then
         self["on_" .. id](self, ...)
     elseif type(self.__events[id]) == "function" then

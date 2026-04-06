@@ -35,7 +35,7 @@ function Screen:get_y()
 end
 
 function Screen:clear()
-    component.gpu.fill(0, 0, self.__width, self.__height, " ")
+    component.gpu.fill(1, 1, self.__width, self.__height, " ")
 end
 
 function Screen:add_component(c)

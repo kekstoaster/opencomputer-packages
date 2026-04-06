@@ -21,6 +21,8 @@ function GuiScreen:invalidate()
 end
 
 function GuiScreen:with_color(callback, fg_col, bg_col)
+    local old_fg
+    local old_bg
     if fg_col ~= nil then
         old_fg = component.gpu.setForeground(fg_col, false)
     end

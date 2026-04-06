@@ -51,4 +51,4 @@ function FileMirror:set(key, value)
     self:save()
 end
 
-return FileMirrorConstruct
+return static

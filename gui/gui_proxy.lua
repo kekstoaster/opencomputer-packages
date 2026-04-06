@@ -1,4 +1,3 @@
-local component = require("component")
 local class = require("class")
 
 local GuiProxy, static = class()
